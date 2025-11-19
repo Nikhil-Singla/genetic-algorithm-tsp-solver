@@ -132,7 +132,7 @@ def CalculateFitness(listOfPaths, start=0, RankedScore=None):
 
     for i in range(start, totalBreedingPopulation):
         sum = 0
-        for j in range(2, totalCities):
+        for j in range(1, totalCities):
             point1 = tuple(listOfPaths[i][j])  
             point2 = tuple(listOfPaths[i][j-1]) 
             sum += distance_lookup[point1 + point2]

@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from itertools import permutations
 
 def readFromFile():
     code_location = os.path.dirname(os.path.abspath(__file__))
@@ -120,11 +121,13 @@ def CalculateFitness(inputPathsGiven, start=0, RankedScore=None):
 
     for i in range(start, totalBreedingPopulation):
         sum = 0
-        for j in range(2, totalCities):
+        # Calculate all consecutive edges including the first one (0->1)
+        for j in range(1, totalCities):
             point1 = tuple(inputPathsGiven[i][j])  
             point2 = tuple(inputPathsGiven[i][j-1]) 
             sum += distance_lookup[point1 + point2]
 
+        # Add distance from last city back to first city to complete the tour
         point1 = tuple(inputPathsGiven[i][totalCities-1])  
         point2 = tuple(inputPathsGiven[i][0]) 
         sum += distance_lookup[point1 + point2]
@@ -137,19 +140,29 @@ def CalculateFitness(inputPathsGiven, start=0, RankedScore=None):
     return sorted_RankList, sorted_listOfPaths
 
 
-def exhausutiveBruteForce(copyList):
-    allPermutations = np.empty((totalBreedingPopulation, totalCities, 3), dtype=copyList.dtype)
-    for i in range(totalBreedingPopulation):
-        allPermutations[i] = np.random.permutation(copyList)
+def exhausutiveBruteForce(inputCityList):    
+    # Generate ALL possible permutations
+    all_perms = list(permutations(range(totalCities)))
+    num_permutations = len(all_perms)
+    
+    allPermutations = np.empty((num_permutations, totalCities, 3), dtype=inputCityList.dtype)
+    for i, perm in enumerate(all_perms):
+        allPermutations[i] = inputCityList[list(perm)]
+    
+    # Need to adjust for the larger array size
+    global totalBreedingPopulation
+    original_pop = totalBreedingPopulation
+    totalBreedingPopulation = num_permutations
+    
     orderedRank, orderedPaths = CalculateFitness(allPermutations)
-
+    
+    totalBreedingPopulation = original_pop  # Restore original value
+    
     write_output_to_file(orderedRank[0], orderedPaths[0])
     raise SystemExit
 
 if(totalCities <= 6):
-    copyList = np.zeros((totalCities, 3), dtype=cityList.dtype) 
-    copyList = np.array([cityList])
-    exhausutiveBruteForce(copyList)
+    exhausutiveBruteForce(cityList)
 
 def CreateInitialPopulation(cityList):
     initial_population = np.zeros((totalBreedingPopulation, len(cityList), cityList.shape[1]), dtype=cityList.dtype)
