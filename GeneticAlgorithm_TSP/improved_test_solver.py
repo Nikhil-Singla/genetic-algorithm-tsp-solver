@@ -2,26 +2,27 @@ import os
 import numpy as np
 from itertools import permutations
 
+input_file_name = "input.txt"
+output_file_name = "output.txt"
+subdirectory_name = "inputs_and_outputs"
+input_subdirectory = os.path.join(subdirectory_name, input_file_name)
+output_subdirectory = os.path.join(subdirectory_name, output_file_name)
+
 def readFromFile():
     code_location = os.path.dirname(os.path.abspath(__file__))
-    input_file = os.path.join(code_location, 'input.txt')
-    i = 0
-    totalCities = 0
+    input_file = os.path.join(code_location, input_subdirectory)
+    
     with open(input_file, 'r') as file:
-        for line in file:
-            if(totalCities == 0):
-                totalCities = int(line.strip())
-                cityList = np.zeros((totalCities, 3), dtype=int)
-            else:
-                x, y, z = map(int, line.split())
-                cityList[i] = np.array([x, y, z])
-                i += 1
-
+        lines = file.readlines()
+        totalCities = int(lines[0].strip())
+        cityList = np.array([list(map(int, line.split())) for line in lines[1:]], dtype=int)
+    
     return totalCities, cityList 
 
-totalBreedingPopulation = 100
-MutationRate = 8
 TotalGenerations = 1000
+totalBreedingPopulation = 100
+
+MutationRate = 8
 howManyParts = 2
 
 totalCities, cityList = readFromFile()
@@ -81,7 +82,7 @@ for i in range(len(cityList)):
 
 def write_output_to_file(bestRank, bestPath):
     code_location = os.path.dirname(os.path.abspath(__file__))
-    output_file = os.path.join(code_location, 'output.txt')
+    output_file = os.path.join(code_location, output_subdirectory)
 
     with open(output_file, 'w') as file:
         file.write(f"{int(bestRank[0])}\n")

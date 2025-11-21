@@ -55,7 +55,9 @@ def random_size_picker():
 # Output this to a file and call it input.txt
 def write_output_to_file():
     code_location = os.path.dirname(os.path.abspath(__file__))
-    output_file_path = os.path.join(code_location, FINAL_FILE_NAME)
+    inputs_outputs_folder = os.path.join(code_location, 'inputs_and_outputs')
+    os.makedirs(inputs_outputs_folder, exist_ok=True)
+    output_file_path = os.path.join(inputs_outputs_folder, FINAL_FILE_NAME)
 
     N = abs(args['fixed_size']) if args['fixed_size'] else random_size_picker()
 
